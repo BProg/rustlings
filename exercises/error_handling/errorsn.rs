@@ -20,11 +20,11 @@ use std::fmt;
 use std::io;
 
 // PositiveNonzeroInteger is a struct defined below the tests.
-fn read_and_validate(b: &mut dyn io::BufRead) -> Result<PositiveNonzeroInteger, ???> {
+fn read_and_validate(b: &mut dyn io::BufRead) -> Result<PositiveNonzeroInteger, Box<dyn error::Error>> {
     let mut line = String::new();
-    b.read_line(&mut line);
-    let num: i64 = line.trim().parse();
-    let answer = PositiveNonzeroInteger::new(num);
+    b.read_line(&mut line)?;
+    let num: i64 = line.trim().parse()?;
+    let answer = PositiveNonzeroInteger::new(num).map_err(|e| {Box::new(e) as Box<dyn error::Error>});
     answer
 }
 
@@ -110,6 +110,12 @@ impl error::Error for CreationError {
         }
     }
 }
+
+// impl From<CreationError> for Box<dyn error::Error> {
+//     fn from(e: CreationError) -> Box<dyn error::Error> {
+//         Box::new(e)
+//     }
+// }
 
 
 
